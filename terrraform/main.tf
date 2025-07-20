@@ -85,12 +85,12 @@ resource "azurerm_network_interface" "nic" {
     name                          = "internal"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
-    load_balancer_backend_address_pools_ids = [
-      azurerm_lb_backend_address_pool.bepool.id
-    ]
+    # load_balancer_backend_address_pools_ids = [
+    #   azurerm_lb_backend_address_pool.bepool.id
+    # ]
   }
 
-  network_security_group_id = azurerm_network_security_group.nsg.id
+  # network_security_group_id = azurerm_network_security_group.nsg.id
 }
 
 resource "azurerm_linux_virtual_machine" "vm" {

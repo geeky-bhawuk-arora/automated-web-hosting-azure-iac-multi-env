@@ -1,0 +1,59 @@
+
+- name: Deploy Tomato App on Azure VMs
+  hosts: web
+  become: true
+  vars:
+    app_dir: /home/bhawuk_arora/tomato-app
+    backend_dir: "{{ app_dir }}/app/backend"
+    frontend_dir: "{{ app_dir }}/app/frontend"
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install required packages
+      apt:
+        name:
+          - git
+          - nodejs
+          - npm
+          - build-essential
+        state: present
+
+    - name: Install pm2 globally
+      npm:
+        name: pm2
+        global: yes
+
+    - name: Clone tomato-app repo (or pull latest)
+      git:
+        repo: 'https://github.com/geeky-bhawuk-arora/iac-multi-env-azure-webinfra.git'
+        dest: "{{ app_dir }}"
+        version: main
+        force: yes
+
+    - name: Install backend npm dependencies
+      npm:
+        path: "{{ backend_dir }}"
+        production: yes
+
+    - name: Start backend with pm2
+      shell: |
+        pm2 stop tomato-backend || true
+        pm2 start index.js --name tomato-backend --cwd {{ backend_dir }}
+        pm2 save
+      args:
+        executable: /bin/bash
+
+    - name: Install serve globally (for frontend)
+      npm:
+        name: serve
+        global: yes
+
+    - name: Start frontend using serve on port 80
+      shell: |
+        pkill -f "serve -s {{ frontend_dir }}" || true
+        nohup serve -s {{ frontend_dir }} -l 80 > /dev/null 2>&1 &
+      args:
+        executable: /bin/bash
