@@ -1,0 +1,40 @@
+name: Deploy Web App via Terraform & Ansible
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target Environment (dev/uat/prod)'
+        required: true
+        default: 'dev'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_public_key_path: ~/.ssh/id_rsa.pub
+      TF_VAR_admin_username: azureuser
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+
+      - name: Terraform Apply
+        run: |
+          terraform -chdir=terraform apply -auto-approve -var-file="${{ github.event.inputs.environment }}.tfvars"
+
+      - name: Install SSH Key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Run Ansible Playbook
+        run: |
+          ansible-playbook ansible/deploy_backend.yml -i ansible/inventory_${{ github.event.inputs.environment }}.ini
