@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tomato 🍅 - Food Ordering</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo">🍅 Tomato</div>
+    <nav class="nav">
+      <input type="text" id="searchInput" placeholder="Search restaurants or dishes..." />
+    </nav>
+  </header>
+
+  <section class="categories">
+    <button class="category active" data-category="all">All</button>
+    <button class="category" data-category="pizza">Pizza</button>
+    <button class="category" data-category="burger">Burger</button>
+    <button class="category" data-category="dessert">Dessert</button>
+    <button class="category" data-category="sushi">Sushi</button>
+  </section>
+
+  <main class="restaurant-list" id="restaurantList">
+    <!-- Restaurant cards dynamically inserted here -->
+  </main>
+
+  <aside class="cart" id="cartSidebar">
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <div class="cart-total">
+      Total: ₹<span id="cartTotal">0</span>
+    </div>
+    <button id="checkoutBtn" disabled>Checkout</button>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>
