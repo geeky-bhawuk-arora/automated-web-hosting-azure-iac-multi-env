@@ -1,177 +1,109 @@
-# ☁️ Azure Web Infrastructure with Load Balancer using Terraform + GitHub Actions
+# Automated Web Hosting Solution with Single Click Replication to Uact And Prod Environment
 
-This project provisions a **highly available Azure web infrastructure** using **Terraform**, and automates deployment across **Dev**, **UAT**, and **Prod** environments via **GitHub Actions**.
-
----
-
-## 📦 What This Does
-
-✅ Provisions:
-
-- A **Virtual Network (VNet)**  
-- A **Subnet**  
-- A **Network Security Group (NSG)**  
-- Two **Ubuntu Virtual Machines**  
-- An **Azure Load Balancer (Public)**  
-- A **Backend Pool** with the two VMs  
-- A **custom web page** on each VM (via cloud-init or Ansible)
+This repository contains Terraform configurations to deploy a scalable and environment-specific infrastructure on Microsoft Azure. It's designed to support multiple environments like Development (`dev`), User Acceptance Testing (`uat`), and Production (`prod`) using separate variable files.
 
 ---
 
-## 🌍 Environments Supported
+## Prerequisites
 
-- **Development**
-- **UAT (User Acceptance Testing)**
-- **Production**
-
-Each environment uses its own configuration file:
-environments/
-├── dev.tfvars
-├── uat.tfvars
-└── prod.tfvars
-
-yaml
-Copy
-Edit
-
----
-
-## 🔧 Tools Used
-
-| Tool         | Purpose                              |
-|--------------|--------------------------------------|
-| Terraform    | Provision Azure resources            |
-| GitHub Actions | Automate CI/CD pipeline             |
-| Azure CLI    | Authentication and login             |
-
----
-
-## 📁 Project Structure
-
-azure-loadbalancer-project/
-├── main.tf
-├── variables.tf
-├── outputs.tf
-├── environments/
-│ ├── dev.tfvars
-│ ├── uat.tfvars
-│ └── prod.tfvars
-├── .github/
-│ └── workflows/
-│ └── terraform-deploy.yml
-├── README.md
-
-yaml
-Copy
-Edit
+Before you begin, make sure you have the following tools installed on your local machine:
+* [Git](https://git-scm.com/downloads)
+* [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+* [Terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli)
 
 ---
 
 ## 🚀 Getting Started
 
-### Step 1: Login to Azure
+Follow these steps to deploy the Azure infrastructure.
+
+### 1. Clone the Repository
+Clone this repository to your local machine and navigate into the project directory.
+```bash
+git clone https://github.com/geeky-bhawuk-arora/automated-web-hosting-azure-iac-multi-env
+cd automated-web-hosting-azure-iac-multi-env
+```
+2. Authenticate with Azure
+Log in to your Azure account using the Azure CLI.
 
 ```bash
 az login
-Step 2: Initialize Terraform
-bash
-Copy
-Edit
+```
+If you have multiple Azure subscriptions, make sure to set the correct one for this deployment.
+
+```bash
+az account set --subscription "<subscription-id>"
+```
+
+3. Initialize Terraform
+Initialize the Terraform working directory. This will download the necessary providers and set up the backend.
+
+```bash
 terraform init
-Step 3: Apply Environment
-To deploy Dev:
+```
+4. Select an Environment
+The configuration is managed through environment-specific variable files:
 
-bash
-Copy
-Edit
-terraform apply -var-file="environments/dev.tfvars"
-To deploy UAT:
+dev.tfvars for the Development environment.
 
-bash
-Copy
-Edit
-terraform apply -var-file="environments/uat.tfvars"
-To deploy Prod:
+uat.tfvars for the User Acceptance Testing environment.
 
-bash
-Copy
-Edit
-terraform apply -var-file="environments/prod.tfvars"
-🤖 GitHub Actions CI/CD
-GitHub Actions automates the deployment when you push changes to specific branches like dev, uat, or main.
+prod.tfvars for the Production environment.
 
-📂 Sample Workflow: .github/workflows/terraform-deploy.yml
-yaml
-Copy
-Edit
-name: Deploy Terraform to Azure
+Choose the appropriate file for the environment you wish to deploy.
 
-on:
-  push:
-    branches:
-      - dev
-      - uat
-      - main
+5. Validate and Plan
+Generate an execution plan to preview the changes Terraform will make. This step is a dry run and won't create any resources.
+Replace dev.tfvars with the file for your target environment (e.g., uat.tfvars or prod.tfvars).
 
-jobs:
-  terraform:
-    runs-on: ubuntu-latest
+```bash
+terraform plan -var-file=dev.tfvars
+```
+6. Apply the Configuration
+Apply the changes to create the infrastructure on Azure. Terraform will ask for a final confirmation before proceeding.
 
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+Bash
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: 1.6.0
+terraform apply -var-file=dev.tfvars
+When prompted, type yes and press Enter to confirm.
 
-    - name: Azure Login
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+⚙️ Configuration Variables
+All environment-specific configuration is managed via .tfvars files. Key configurable variables include:
 
-    - name: Terraform Init
-      run: terraform init
+Variable Name	Description	Example Value
+env_name	Environment name (dev, uat, prod)	dev
+resource_group_name	Name of the Azure Resource Group	dev-rg
+vnet_cidr	Virtual Network CIDR block	10.1.0.0/16
+subnet_frontend_cidr	Frontend subnet CIDR block	10.1.0.0/24
+subnet_backend_cidr	Backend subnet CIDR block	10.1.1.0/24
+vm_size	Azure VM size	Standard_B2s
+vm_image	VM Image reference	UbuntuLTS
 
-    - name: Terraform Apply
-      run: |
-        BRANCH=$(echo "${GITHUB_REF##*/}")
-        terraform apply -auto-approve -var-file="environments/${BRANCH}.tfvars"
-🧠 You'll need to store AZURE_CREDENTIALS in GitHub Secrets (you can generate it via az ad sp create-for-rbac).
+Export to Sheets
+Refer to the .tfvars files for a complete list of environment-specific configurations.
 
-🌐 Accessing Your Website
-Once deployed, Terraform will output the public IP address of the Load Balancer.
+📄 Outputs
+After a successful deployment, Terraform will display key output values. You can use these to connect to your resources or for further configuration.
 
-Open your browser and navigate to:
+Resource Group Name: The name of the deployed resource group.
 
-cpp
-Copy
-Edit
-http://<load_balancer_public_ip>
-You should see the web page served from one of the backend VMs.
+Virtual Network & Subnet IDs: The unique identifiers for your VNet and subnets.
 
-🧹 Tear Down (Clean Up)
-To destroy resources from a specific environment:
+Public IP Addresses: Public IP addresses assigned to VMs or Load Balancers.
 
-bash
-Copy
-Edit
-terraform destroy -var-file="environments/dev.tfvars"
-📌 Notes
-Each VM can be configured using cloud-init or external config tools like Ansible
+Load Balancer Frontend IP: The IP address for accessing services behind the load balancer.
 
-Ensure you open port 80 in NSG rules
+You can also view these outputs at any time by running:
 
-VM size and region can be customized in each *.tfvars
+Bash
 
-🔐 Secrets Setup for GitHub Actions
-Generate a service principal:
+terraform output
+💣 Destroying the Infrastructure
+To tear down all resources managed by this Terraform configuration, run the destroy command.
 
-bash
-Copy
-Edit
-az ad sp create-for-rbac --role="Contributor" --scopes="/subscriptions/<subscription_id>" --sdk-auth
-Copy the JSON output and save it as a secret in GitHub:
-Repo → Settings → Secrets → Actions → AZURE_CREDENTIALS
+⚠️ Warning: This action is irreversible and will permanently delete all created resources.
 
+Bash
+
+terraform destroy -var-file=dev.tfvars
+When prompted, type yes and press Enter to confirm the destruction.
