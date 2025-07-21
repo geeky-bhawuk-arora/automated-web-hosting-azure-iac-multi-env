@@ -41,69 +41,187 @@ Initialize the Terraform working directory. This will download the necessary pro
 ```bash
 terraform init
 ```
-4. Select an Environment
-The configuration is managed through environment-specific variable files:
+## 🚀 Deploying the Infrastructure
 
-dev.tfvars for the Development environment.
+Follow these steps to deploy your chosen environment.
 
-uat.tfvars for the User Acceptance Testing environment.
+---
 
-prod.tfvars for the Production environment.
+### 1. Select an Environment
 
-Choose the appropriate file for the environment you wish to deploy.
+The configuration is managed through environment-specific variable files. Before proceeding, choose the appropriate file for the environment you wish to deploy:
 
-5. Validate and Plan
-Generate an execution plan to preview the changes Terraform will make. This step is a dry run and won't create any resources.
-Replace dev.tfvars with the file for your target environment (e.g., uat.tfvars or prod.tfvars).
+* **`dev.tfvars`** for the Development environment.
+* **`uat.tfvars`** for the User Acceptance Testing environment.
+* **`prod.tfvars`** for the Production environment.
+
+---
+
+### 2. Validate and Plan
+
+Generate an execution plan to preview the changes Terraform will make. This step is a **dry run** and won't create any actual resources.
+
+*Remember to replace **`dev.tfvars`** with your target environment file (e.g., **`uat.tfvars`**).*
 
 ```bash
 terraform plan -var-file=dev.tfvars
 ```
-6. Apply the Configuration
-Apply the changes to create the infrastructure on Azure. Terraform will ask for a final confirmation before proceeding.
+---
 
-Bash
+Once your `.tfvars` file is configured, run the following commands to deploy the resources.
 
+
+###  3. Initialize Terraform (only needs to be run once in your directory)
+```bash
+terraform init
+```
+
+### 4. Create the execution plan and deploy the resources
 terraform apply -var-file=dev.tfvars
-When prompted, type yes and press Enter to confirm.
 
-⚙️ Configuration Variables
-All environment-specific configuration is managed via .tfvars files. Key configurable variables include:
-
-Variable Name	Description	Example Value
-env_name	Environment name (dev, uat, prod)	dev
-resource_group_name	Name of the Azure Resource Group	dev-rg
-vnet_cidr	Virtual Network CIDR block	10.1.0.0/16
-subnet_frontend_cidr	Frontend subnet CIDR block	10.1.0.0/24
-subnet_backend_cidr	Backend subnet CIDR block	10.1.1.0/24
-vm_size	Azure VM size	Standard_B2s
-vm_image	VM Image reference	UbuntuLTS
-
-Export to Sheets
-Refer to the .tfvars files for a complete list of environment-specific configurations.
-
-📄 Outputs
+📄 Outputs -
 After a successful deployment, Terraform will display key output values. You can use these to connect to your resources or for further configuration.
 
-Resource Group Name: The name of the deployed resource group.
+## Resource Group
 
-Virtual Network & Subnet IDs: The unique identifiers for your VNet and subnets.
+* **Name**: `[Your-Resource-Group-Name]`
 
-Public IP Addresses: Public IP addresses assigned to VMs or Load Balancers.
+---
 
-Load Balancer Frontend IP: The IP address for accessing services behind the load balancer.
+## Virtual Network (VNet) & Subnets
+
+* **Virtual Network ID**:
+    ```
+    /subscriptions/[Your-Subscription-ID]/resourceGroups/[Your-Resource-Group-Name]/providers/Microsoft.Network/virtualNetworks/[Your-VNet-Name]
+    ```
+* **Subnet ID(s)**:
+    ```
+    # Subnet 1
+    /subscriptions/[Your-Subscription-ID]/resourceGroups/[Your-Resource-Group-Name]/providers/Microsoft.Network/virtualNetworks/[Your-VNet-Name]/subnets/[Your-Subnet-1-Name]
+
+    # Subnet 2
+    /subscriptions/[Your-Subscription-ID]/resourceGroups/[Your-Resource-Group-Name]/providers/Microsoft.Network/virtualNetworks/[Your-VNet-Name]/subnets/[Your-Subnet-2-Name]
+    ```
+
+---
+
+## Public IP Addresses
+
+* **VM-1 Public IP**: `[Public-IP-Address-for-VM-1]`
+* **VM-2 Public IP**: `[Public-IP-Address-for-VM-2]`
+
+---
+
+## Load Balancer
+
+* **Load Balancer Frontend Public IP**: `[Load-Balancer-Public-IP]`
 
 You can also view these outputs at any time by running:
 
-Bash
-
+```bash
 terraform output
-💣 Destroying the Infrastructure
+```
+
+### 💣 Destroying the Infrastructure
 To tear down all resources managed by this Terraform configuration, run the destroy command.
 
 ⚠️ Warning: This action is irreversible and will permanently delete all created resources.
 
-Bash
-
+```bash
 terraform destroy -var-file=dev.tfvars
+```
 When prompted, type yes and press Enter to confirm the destruction.
+
+
+# 🍽️ Ansible Deployment - Tomato App (Azure Multi-Env)
+
+This Ansible configuration automates the **deployment and configuration** of a Node.js backend and static frontend (served via `serve`) for the Tomato food ordering app. It supports **multi-environment deployment** on **Azure VMs provisioned via Terraform**.
+
+---
+
+## 📁 Project Structure
+
+ansible/
+├── group_vars/
+│ └── all.yml # Global variables (paths, user, repo, ports)
+├── host_vars/ # (optional: per-host overrides)
+├── inventories/
+│ ├── inventory_dev.ini
+│ ├── inventory_uat.ini
+│ └── inventory_prod.ini
+├── roles/
+│ ├── backend/
+│ │ └── tasks/main.yml
+│ ├── frontend/
+│ │ └── tasks/main.yml
+│ ├── nginx/
+│ │ └── tasks/main.yml # Optional reverse proxy setup
+│ └── common/
+│ └── tasks/main.yml # Common system tasks (apt update, users, etc.)
+├── files/
+│ └── (optional static files)
+├── templates/
+│ └── nginx.conf.j2 # Optional Nginx config template
+├── deploy.yml # Master playbook for full deployment
+
+yaml
+Copy
+Edit
+
+---
+
+## 🚀 What This Playbook Does
+
+- ✅ Installs dependencies (`nodejs`, `npm`, `pm2`, `serve`)
+- ✅ Clones your GitHub repo (`main` branch)
+- ✅ Installs backend packages via `npm`
+- ✅ Starts backend using `pm2`
+- ✅ Serves frontend on port 80 using `serve`
+- ✅ (Optional) Configures and restarts Nginx as reverse proxy
+
+---
+
+## 🧠 Prerequisites
+
+- Ansible 2.12+
+- Azure VMs provisioned via Terraform
+- Public IPs reachable from GitHub Actions
+- SSH access enabled (via `azureuser` + SSH key)
+- Your app repo is publicly accessible or a deploy key is configured
+
+---
+
+## 🔐 Inventory Files
+
+You must maintain **per-environment inventory files**:
+
+Example: `inventories/inventory_dev.ini`
+
+```ini
+[web]
+20.123.45.67 ansible_user=azureuser ansible_ssh_private_key_file=~/.ssh/id_rsa
+🔧 Configuration Variables
+Set in: group_vars/all.yml
+
+yaml
+Copy
+Edit
+app_dir: /home/azureuser/tomato-app
+backend_dir: "{{ app_dir }}/app/backend"
+frontend_dir: "{{ app_dir }}/app/frontend"
+repo_url: https://github.com/geeky-bhawuk-arora/iac-multi-env-azure-webinfra.git
+🚀 Run Locally (Optional Testing)
+bash
+Copy
+Edit
+ansible-playbook -i inventories/inventory_dev.ini deploy.yml
+🤖 CI/CD via GitHub Actions
+This Ansible setup is executed post-Terraform deployment in your GitHub Actions pipeline:
+
+yaml
+Copy
+Edit
+- name: Run Ansible Playbook
+  run: |
+    ansible-playbook ansible/deploy.yml -i ansible/inventories/inventory_${{ github.event.inputs.environment }}.ini
+Secrets like the SSH private key are configured in GitHub → Repo → Settings → Secrets.
