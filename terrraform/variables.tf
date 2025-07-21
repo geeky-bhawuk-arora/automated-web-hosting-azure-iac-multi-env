@@ -1,22 +1,5 @@
-variable "env_name" {
-  description = "Environment name: dev/uat/prod"
-  type        = string
-}
-
-variable "location" {
-  default = "East US"
-}
-
-variable "admin_username" {
-  type = string
-}
-
-variable "public_key_path" {
-  description = "Path to your public SSH key"
-  type        = string
-}
-
-variable "vm_count" {
-  description = "Number of VMs to create"
-  type        = number
-}
+variable "env_name" {}
+variable "location" {}
+variable "vm_count" {}
+variable "admin_username" {}
+variable "public_key_path" {}

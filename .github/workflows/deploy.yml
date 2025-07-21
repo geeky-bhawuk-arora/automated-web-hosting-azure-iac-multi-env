@@ -27,14 +27,27 @@ jobs:
         run: terraform -chdir=terraform init
 
       - name: Terraform Apply
-        run: |
-          terraform -chdir=terraform apply -auto-approve -var-file="${{ github.event.inputs.environment }}.tfvars"
+        run: terraform -chdir=terraform apply -auto-approve -var-file="terraform/env/${{ github.event.inputs.environment }}.tfvars"
 
       - name: Install SSH Key
         run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Run Ansible Playbook
+      - name: Disable SSH host key checking
         run: |
-          ansible-playbook ansible/deploy_backend.yml -i ansible/inventory_${{ github.event.inputs.environment }}.ini
+          mkdir -p ~/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+
+      - name: Setup Python and Install Ansible
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Run Ansible Playbook
+        run: ansible-playbook ansible/playbook.yml -i ansible/inventories/${{ github.event.inputs.environment }}.ini --private-key ~/.ssh/id_rsa
