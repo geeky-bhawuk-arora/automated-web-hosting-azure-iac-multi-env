@@ -20,8 +20,9 @@ Follow these steps to deploy the Azure infrastructure.
 ### 1. Clone the Repository
 Clone this repository to your local machine and navigate into the project directory.
 ```bash
-git clone <repository-url>
-cd <repository-directory>
+git clone https://github.com/geeky-bhawuk-arora/automated-web-hosting-azure-iac-multi-env
+cd automated-web-hosting-azure-iac-multi-env
+```
 2. Authenticate with Azure
 Log in to your Azure account using the Azure CLI.
 
