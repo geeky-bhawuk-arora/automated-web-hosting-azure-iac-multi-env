@@ -26,20 +26,21 @@ cd automated-web-hosting-azure-iac-multi-env
 2. Authenticate with Azure
 Log in to your Azure account using the Azure CLI.
 
-Bash
-
+```bash
 az login
+```
 If you have multiple Azure subscriptions, make sure to set the correct one for this deployment.
 
-Bash
+```bash
+az account set --subscription "<subscription-id>"
+```
 
-az account set --subscription "<your-subscription-id>"
 3. Initialize Terraform
 Initialize the Terraform working directory. This will download the necessary providers and set up the backend.
 
-Bash
-
+```bash
 terraform init
+```
 4. Select an Environment
 The configuration is managed through environment-specific variable files:
 
@@ -55,9 +56,9 @@ Choose the appropriate file for the environment you wish to deploy.
 Generate an execution plan to preview the changes Terraform will make. This step is a dry run and won't create any resources.
 Replace dev.tfvars with the file for your target environment (e.g., uat.tfvars or prod.tfvars).
 
-Bash
-
+```bash
 terraform plan -var-file=dev.tfvars
+```
 6. Apply the Configuration
 Apply the changes to create the infrastructure on Azure. Terraform will ask for a final confirmation before proceeding.
 
