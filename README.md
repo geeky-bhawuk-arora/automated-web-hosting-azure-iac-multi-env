@@ -1,6 +1,70 @@
 # Automated Web Hosting Solution with Single Click Replication to Uact And Prod Environment
 
-This repository contains Terraform configurations to deploy a scalable and environment-specific infrastructure on Microsoft Azure. It's designed to support multiple environments like Development (`dev`), User Acceptance Testing (`uat`), and Production (`prod`) using separate variable files.
+This repository provides a fully automated solution to provision, configure, and deploy a web application across multiple environments (dev, uat, prod) using:
+
+- Terraform for Infrastructure as Code (IaC)
+
+- Ansible for Application Configuration
+
+- GitHub Actions for CI/CD integration
+ ---
+
+
+## 📦 Sections Overview
+- Project Structure
+
+- Project Overview
+
+- Prerequisites
+
+- Terraform Deployment
+
+- Ansible App Configuration
+
+- GitHub Actions CI/CD
+
+- Infrastructure Outputs
+
+- Destroy Infrastructure
+---
+
+## 📁 Project Structure
+
+```bash
+automated-web-hosting-azure-iac-multi-env/
+├── terraform/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── dev.tfvars
+│   ├── uat.tfvars
+│   ├── prod.tfvars
+├── ansible/
+│   ├── deploy.yml
+│   ├── group_vars/
+│   │   └── all.yml
+│   ├── inventories/
+│   │   ├── inventory_dev.ini
+│   │   ├── inventory_uat.ini
+│   │   └── inventory_prod.ini
+│   ├── roles/
+│   │   ├── common/
+│   │   │   └── tasks/main.yml
+│   │   ├── backend/
+│   │   │   └── tasks/main.yml
+│   │   ├── frontend/
+│   │   │   └── tasks/main.yml
+│   │   └── nginx/
+│   │       └── tasks/main.yml
+│   ├── templates/
+│   │   └── nginx.conf.j2
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+├── README.md
+```
+
+
 
 ---
 
@@ -13,7 +77,7 @@ Before you begin, make sure you have the following tools installed on your local
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 Follow these steps to deploy the Azure infrastructure.
 
