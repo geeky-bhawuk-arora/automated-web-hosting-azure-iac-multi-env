@@ -140,7 +140,7 @@ This Ansible configuration automates the **deployment and configuration** of a N
 ---
 
 ## 📁 Project Structure
-
+```bash
 ansible/
 ├── group_vars/
 │ └── all.yml # Global variables (paths, user, repo, ports)
@@ -163,10 +163,8 @@ ansible/
 ├── templates/
 │ └── nginx.conf.j2 # Optional Nginx config template
 ├── deploy.yml # Master playbook for full deployment
+```
 
-yaml
-Copy
-Edit
 
 ---
 
@@ -193,35 +191,45 @@ Edit
 
 ## 🔐 Inventory Files
 
-You must maintain **per-environment inventory files**:
+You must maintain **per-environment inventory files** to define the hosts for each specific environment (e.g., `dev`, `staging`, `prod`).
 
-Example: `inventories/inventory_dev.ini`
+**Example:** `inventories/inventory_dev.ini`
 
 ```ini
 [web]
 20.123.45.67 ansible_user=azureuser ansible_ssh_private_key_file=~/.ssh/id_rsa
-🔧 Configuration Variables
-Set in: group_vars/all.yml
+```
+⚙️ Configuration Variables
+Global configuration variables are set in the group_vars/all.yml file. These variables are accessible to all hosts in your inventory.
 
-yaml
-Copy
-Edit
+File: group_vars/all.yml
+
+```yaml
 app_dir: /home/azureuser/tomato-app
 backend_dir: "{{ app_dir }}/app/backend"
 frontend_dir: "{{ app_dir }}/app/frontend"
-repo_url: https://github.com/geeky-bhawuk-arora/iac-multi-env-azure-webinfra.git
-🚀 Run Locally (Optional Testing)
-bash
-Copy
-Edit
-ansible-playbook -i inventories/inventory_dev.ini deploy.yml
-🤖 CI/CD via GitHub Actions
-This Ansible setup is executed post-Terraform deployment in your GitHub Actions pipeline:
+repo_url: https://github.com/geeky-bhawuk-arora/iac-multi-env-azure-webinfra.git]
+```
 
-yaml
-Copy
-Edit
+## 🚀 Run Locally (Optional Testing)
+
+To run the deployment playbook on your local machine for testing, use the following command. Make sure to specify the correct inventory file for the target environment.
+
+
+```bash
+ansible-playbook -i inventories/inventory_dev.ini deploy.yml
+```
+
+## 🤖 CI/CD via GitHub Actions
+This Ansible setup is designed to be executed within a GitHub Actions pipeline, typically after a Terraform deployment stage. The environment is dynamically selected based on the workflow input.
+
+GitHub Actions Workflow Step:
+
+```yaml
 - name: Run Ansible Playbook
   run: |
     ansible-playbook ansible/deploy.yml -i ansible/inventories/inventory_${{ github.event.inputs.environment }}.ini
-Secrets like the SSH private key are configured in GitHub → Repo → Settings → Secrets.
+
+```
+💡 Note: Sensitive data, such as SSH_PRIVATE_KEY, should be stored as encrypted secrets in your GitHub repository:
+Settings → Secrets and variables → Actions
