@@ -297,3 +297,35 @@ GitHub Actions Workflow Step:
 ```
 💡 Note: Sensitive data, such as SSH_PRIVATE_KEY, should be stored as encrypted secrets in your GitHub repository:
 Settings → Secrets and variables → Actions
+
+
+## 🚦 How This Project Works
+This project automates provisioning, configuring, and deploying web hosting infrastructure across multiple environments (dev, uat, prod) with single-click replication.
+
+### Infrastructure Provisioning with Terraform
+- Uses environment-specific .tfvars files to set parameters per environment.
+
+- Runs terraform apply to provision Azure resources (resource groups, VNets, subnets, public IPs, VMs, load balancer) tailored for each environment.
+
+- Ensures consistent, repeatable infrastructure deployment, enabling easy replication from Dev to UAT and Prod.
+
+### Application Deployment & Configuration with Ansible
+- Uses per-environment inventory files with VM IPs and SSH access details.
+
+- Automates installing Node.js, backend dependencies, and starting services with pm2.
+
+- Serves frontend statically via serve, optionally configures Nginx as reverse proxy.
+
+- Ensures idempotent, environment-aware deployments without manual steps.
+
+## Continuous Integration & Deployment with GitHub Actions
+- Pipeline triggered manually or automatically, taking an environment parameter.
+
+- Runs Terraform to provision/update infrastructure, then runs Ansible to deploy the app.
+
+- Uses GitHub Secrets to store sensitive data securely (SSH keys).
+
+- Supports one-click environment promotion for streamlined workflows.
+
+## Summary
+By combining Terraform, Ansible, and GitHub Actions, this project delivers an automated, scalable web hosting solution with minimal manual intervention enabling effortless replication and deployment across environments.
