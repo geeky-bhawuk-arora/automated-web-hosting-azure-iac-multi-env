@@ -7,26 +7,11 @@ This repository provides a fully automated solution to provision, configure, and
 - Ansible for Application Configuration
 
 - GitHub Actions for CI/CD integration
+
+This setup supports single-click replication to easily promote infrastructure and app deployments from Development to UAT and Production.
+
  ---
 
-
-## 📦 Sections Overview
-- Project Structure
-
-- Project Overview
-
-- Prerequisites
-
-- Terraform Deployment
-
-- Ansible App Configuration
-
-- GitHub Actions CI/CD
-
-- Infrastructure Outputs
-
-- Destroy Infrastructure
----
 
 ## 📁 Project Structure
 
@@ -64,9 +49,35 @@ automated-web-hosting-azure-iac-multi-env/
 ├── README.md
 ```
 
+## 📦 Sections Overview
+- Project Structure
 
+- Project Overview
+
+- Prerequisites
+
+- Terraform Deployment
+
+- Ansible App Configuration
+
+- GitHub Actions CI/CD
+
+- Infrastructure Outputs
+
+- Destroy Infrastructure
 
 ---
+
+## 🧩 Project Overview
+This project automates the provisioning, configuration, and deployment of a web application infrastructure with environment separation for dev, uat, and prod.
+
+It combines:
+
+- Terraform for consistent, repeatable infrastructure provisioning
+
+- Ansible for automated application deployment and configuration
+
+- GitHub Actions for end-to-end CI/CD pipeline orchestration
 
 ## Prerequisites
 
