@@ -1,0 +1,12 @@
+---
+- name: Install serve globally
+  npm:
+    name: serve
+    global: yes
+
+- name: Start frontend with serve on port 80
+  shell: |
+    pkill -f "serve -s {{ frontend_dir }}" || true
+    nohup serve -s {{ frontend_dir }} -l 80 > /dev/null 2>&1 &
+  args:
+    executable: /bin/bash

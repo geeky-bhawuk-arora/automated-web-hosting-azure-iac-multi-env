@@ -27,7 +27,7 @@ jobs:
         run: terraform -chdir=terraform init
 
       - name: Terraform Apply
-        run: terraform -chdir=terraform apply -auto-approve -var-file="terraform/env/${{ github.event.inputs.environment }}.tfvars"
+        run: terraform -chdir=terraform apply -auto-approve -var-file="terraform/${{ github.event.inputs.environment }}.tfvars"
 
       - name: Install SSH Key
         run: |
@@ -37,7 +37,6 @@ jobs:
 
       - name: Disable SSH host key checking
         run: |
-          mkdir -p ~/.ssh
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
           chmod 600 ~/.ssh/config
 
@@ -50,4 +49,4 @@ jobs:
         run: pip install ansible
 
       - name: Run Ansible Playbook
-        run: ansible-playbook ansible/playbook.yml -i ansible/inventories/${{ github.event.inputs.environment }}.ini --private-key ~/.ssh/id_rsa
+        run: ansible-playbook ansible/deploy.yml -i ansible/inventories/inventory_${{ github.event.inputs.environment }}.ini --private-key ~/.ssh/id_rsa

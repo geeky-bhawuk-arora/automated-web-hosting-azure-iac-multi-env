@@ -1,0 +1,5 @@
+app_dir: /var/www/app
+backend_dir: "{{ app_dir }}/backend"
+frontend_dir: "{{ app_dir }}/frontend"
+node_app_port: 3000
+domain_name: yourapp.example.com
